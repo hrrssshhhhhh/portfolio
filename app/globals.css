@@ -1,26 +1,284 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* Night palette for the whole site: the hero, game, and pages share one look. */
+@theme {
+  --color-night: #0b0820;
+  --color-night-2: #15103a; /* raised surfaces: cards, panels, HUD */
+  --color-line: #2e2760; /* borders on night surfaces */
+  --color-sakura: #ff6fae;
+  --color-sky: #5ce1ff;
+  --color-sun: #ffd166; /* also the ring gold */
+  --color-haze: #cfc9ec; /* muted text, 11:1 on night */
+  /* Sakura dusk: the hero and the game (PLAN.md "Art direction"). */
+  --color-peach: #ffb38a;
+  --color-lilac: #b9a6ff;
+  --color-dusk: #2a2d5c;
+  --color-violet: #3b2a6e;
+  --color-blossom: #ff8fbf; /* the scene's softer sakura */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-background: var(--color-night);
+  --color-foreground: #f8f5ff;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --animate-ring-spin: ring-spin 2.4s linear infinite;
+  --animate-pop: pop 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-float: float 4s ease-in-out infinite;
+  --animate-bloom: bloom 1600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-rise: rise 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-burst: burst 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+
+  /* 3D coin-style spin for ring icons. */
+  @keyframes ring-spin {
+    to {
+      transform: rotateY(360deg);
+    }
+  }
+
+  /* Quick bounce, e.g. the ring counter on pickup. */
+  @keyframes pop {
+    50% {
+      transform: scale(1.25);
+    }
+  }
+
+  @keyframes float {
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  /* A data bit's name blooming above the fox, then drifting up and away. */
+  @keyframes bloom {
+    from {
+      transform: translateY(10px) scale(0.85);
+      opacity: 0;
+      filter: blur(6px);
+    }
+    25% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+      filter: blur(0);
+    }
+    70% {
+      opacity: 1;
+    }
+    to {
+      transform: translateY(-24px) scale(1.04);
+      opacity: 0;
+      filter: blur(4px);
+    }
+  }
+
+  /* A ring of light bursting outward once (contact form sent). */
+  @keyframes burst {
+    from {
+      transform: scale(0.6);
+      opacity: 1;
+    }
+    to {
+      transform: scale(3.2);
+      opacity: 0;
+    }
+  }
+
+  /* Panels rising into place (finale results). */
+  @keyframes rise {
+    from {
+      transform: translateY(28px);
+      opacity: 0;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-dela-gothic);
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  }
+
+  /* Anchor targets (#about, #projects…) stop below the floating header. */
+  [id] {
+    scroll-margin-top: 8rem; /* header is two rows on mobile */
+  }
+
+  ::selection {
+    background: var(--color-sakura);
+    color: var(--color-night);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-sky);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Anime title: pink offset with a dark drop behind it. */
+@utility title-shadow {
+  text-shadow:
+    5px 5px 0 var(--color-sakura),
+    10px 10px 0 var(--color-night);
+}
+
+/* Game-UI card: raised surface, hard border, solid offset shadow. */
+@utility panel {
+  background: var(--color-night-2);
+  border: 2px solid var(--color-line);
+  box-shadow: 6px 6px 0 rgb(0 0 0 / 0.45);
+}
+
+/* The hero's dusk sky in CSS: shows before the 3D scene loads (same colors as the sky shader). */
+@utility hero-dusk {
+  background:
+    radial-gradient(ellipse 50% 40% at 62% 58%, #fff1c1 0%, transparent 60%),
+    linear-gradient(180deg, #6b5fa8 0%, #c98aa8 45%, #ffb38a 66%, #a9c48a 67%, #8f9f6a 100%);
+}
+
+/* Manga focus lines radiating from the crystal. */
+@utility speed-lines {
+  background: repeating-conic-gradient(
+    from 0deg at 70% 45%,
+    rgb(255 255 255 / 0.06) 0deg 0.8deg,
+    transparent 0.8deg 7deg
+  );
+  mask-image: radial-gradient(circle at 70% 45%, transparent 22%, black 75%);
+}
+
+/* Small game HUD text that has to stay legible over bright skies. */
+@utility hud-text {
+  text-shadow:
+    0 1px 0 var(--color-night),
+    1px 0 0 var(--color-night),
+    0 -1px 0 var(--color-night),
+    -1px 0 0 var(--color-night),
+    0 2px 6px rgb(0 0 0 / 0.5);
+}
+
+/* Screentone dots, fading out toward the top right. */
+@utility halftone {
+  background-image: radial-gradient(rgb(255 111 174 / 0.35) 1px, transparent 1.6px);
+  background-size: 14px 14px;
+  mask-image: linear-gradient(20deg, black 0%, transparent 55%);
+}
+
+/* Soft frosted dusk surface: HUD chips and the finale panel. */
+@utility glass {
+  background: rgb(42 45 92 / 0.55);
+  border: 1px solid rgb(255 255 255 / 0.18);
+  box-shadow:
+    0 10px 40px rgb(20 10 50 / 0.35),
+    inset 0 1px 0 rgb(255 255 255 / 0.12);
+  backdrop-filter: blur(14px) saturate(1.3);
+}
+
+/* Glowing light text for the dusk scenes. */
+@utility soft-glow {
+  text-shadow:
+    0 0 18px rgb(255 143 191 / 0.55),
+    0 2px 10px rgb(42 20 80 / 0.55);
+}
+
+/* Data-bit unlock (components/sections/BitLabel.tsx): locked until first scrolled into view,
+   then the crystal pops and the label types in. Reduced motion never locks, so no rule needed. */
+.bit-label[data-bit="locked"] .bit-crystal {
+  opacity: 0.3;
+  filter: grayscale(1);
+}
+.bit-label[data-bit="locked"] .bit-text {
+  opacity: 0.25;
+}
+.bit-label[data-bit="unlocked"] .bit-crystal {
+  animation: bit-unlock 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.bit-label[data-bit="unlocked"] .bit-text {
+  animation: bit-type calc(var(--chars) * 28ms) steps(var(--chars), end) 120ms both;
+}
+@keyframes bit-unlock {
+  from {
+    transform: scale(0.4) rotate(-25deg);
+    opacity: 0.3;
+    filter: grayscale(1);
+  }
+  60% {
+    transform: scale(1.35) rotate(8deg);
+    opacity: 1;
+    filter: grayscale(0) brightness(1.6);
+  }
+}
+@keyframes bit-type {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* "Inspect build" on project cards slides open instead of snapping. Browsers without
+   ::details-content drop these rules and just snap, as before. (An @supports selector()
+   wrapper got stripped by the CSS build, so none is used.) */
+:root {
+  interpolate-size: allow-keywords;
+}
+.smooth-details::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    content-visibility 220ms allow-discrete;
+}
+.smooth-details[open]::details-content {
+  block-size: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .smooth-details::details-content {
+    transition: none;
+  }
+}
+
+/* Blog: a post card's title morphs into the post heading (React <ViewTransition share="morph">).
+   A short blur mid-flight hides the text stretching. */
+::view-transition-group(.morph) {
+  animation-duration: 380ms;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+::view-transition-image-pair(.morph) {
+  animation-name: via-blur;
+}
+@keyframes via-blur {
+  30% {
+    filter: blur(3px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }
