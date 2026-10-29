@@ -44,3 +44,8 @@ next-env.d.ts
 
 # key-frame screenshots: regenerate with scripts/keyframes.js
 /docs/keyframes/shots/
+
+# local notes / agent files, not for repo
+PLAN.md
+LEARNINGS.md
+.claude/skills/playwright-cli/
