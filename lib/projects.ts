@@ -44,7 +44,7 @@ export const projects: Project[] = [
     ],
     tech: ["Next.js", "TypeScript", "PostgreSQL", "Supabase", "Drizzle"],
     year: 2026,
-    links: { live: "https://salarysyncc.vercel.app/", github: "https://github.com/hrrssshhhhhh/SalarySync" },
+    links: { live: "https://salarysyncc.vercel.app/", github: "https://github.com/hrrssshhhhhh/SalarySyncc" },
     featured: true,
   },
   {
