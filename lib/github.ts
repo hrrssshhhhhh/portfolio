@@ -31,35 +31,35 @@ type ApiRepo = {
   pushed_at: string;
 };
 
-// Cached for an hour. Throws on a failed request so a GitHub hiccup is never cached as "no repos".
-async function fetchRepos(): Promise<Repo[]> {
-  "use cache";
-  cacheLife("hours");
-  const res = await fetch(`https://api.github.com/users/${user}/repos?per_page=100&sort=pushed`, {
-    headers: { Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" },
-  });
-  if (!res.ok) throw new Error(`GitHub ${res.status}`);
-  const featured = new Set(projects.map((p) => p.links.github?.toLowerCase()));
-  return ((await res.json()) as ApiRepo[])
-    .filter((r) => r.topics?.includes(TOPIC) && !featured.has(r.html_url.toLowerCase()))
-    .map((r) => ({
-      name: r.name,
-      description: r.description ?? "",
-      url: r.html_url,
-      homepage: r.homepage || undefined,
-      language: r.language ?? undefined,
-      topics: (r.topics ?? []).filter((t) => t !== TOPIC),
-      stars: r.stargazers_count,
-      pushedAt: r.pushed_at,
-    }));
-}
-
-// GitHub down or rate-limited: show no extra repos; the featured projects still render.
+// Cached for an hour. GitHub down, slow or rate-limited: no extra repos (the featured projects
+// still render), cached only for minutes so the hiccup isn't remembered. The error must be
+// caught inside "use cache": one thrown out of it fails the prerender even if the caller catches.
 export async function portfolioRepos(): Promise<Repo[]> {
+  "use cache";
   try {
-    return await fetchRepos();
+    const res = await fetch(`https://api.github.com/users/${user}/repos?per_page=100&sort=pushed`, {
+      headers: { Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" },
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!res.ok) throw new Error(`GitHub ${res.status}`);
+    const featured = new Set(projects.map((p) => p.links.github?.toLowerCase()));
+    const repos = ((await res.json()) as ApiRepo[])
+      .filter((r) => r.topics?.includes(TOPIC) && !featured.has(r.html_url.toLowerCase()))
+      .map((r) => ({
+        name: r.name,
+        description: r.description ?? "",
+        url: r.html_url,
+        homepage: r.homepage || undefined,
+        language: r.language ?? undefined,
+        topics: (r.topics ?? []).filter((t) => t !== TOPIC),
+        stars: r.stargazers_count,
+        pushedAt: r.pushed_at,
+      }));
+    cacheLife("hours");
+    return repos;
   } catch (e) {
     console.error("GitHub repos unavailable:", e);
+    cacheLife("minutes");
     return [];
   }
 }
