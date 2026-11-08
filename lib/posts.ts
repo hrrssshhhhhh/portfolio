@@ -14,6 +14,22 @@ export type Post = {
 
 const posts: Post[] = [
   {
+    slug: "salarysync-safe-to-spend",
+    title: "SalarySync: what's still safe to spend",
+    date: "2026-11-08",
+    summary: "A finance app that turns a monthly salary into a plan, and keeps each user's money data locked to them in three layers.",
+    tags: ["Next.js", "PostgreSQL", "Security"],
+    body: [
+      "SalarySync is a full-stack personal finance app. You enter your monthly salary, it splits it into a per-category plan, and as you log expenses it shows what is still safe to spend. It's live on Vercel with Google sign-in.",
+      "## Envelopes, not spreadsheets",
+      "Each category is an envelope that warns you at 90%. A running-total sparkline compares this month against last month's pace, so you can see early when spending is running ahead, and investments are tracked separately from everyday expenses.",
+      "## Three layers between users",
+      "Money data has to stay private, so isolation doesn't rest on one check. Every request verifies the session, every query is scoped to the user's id, and Postgres Row Level Security blocks the public API even if a query slipped through.",
+      "## The stack",
+      "Next.js 16 Server Components and Server Actions on Supabase Postgres through Drizzle ORM, with totals and breakdowns computed in SQL rather than in the browser. Zod validates every action's input. Dark mode loads without a flash, and interactions respect reduced motion and WCAG.",
+    ],
+  },
+  {
     slug: "a-portfolio-you-can-play",
     title: "A portfolio you can play",
     date: "2026-10-28",
