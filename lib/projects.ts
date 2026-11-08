@@ -32,6 +32,22 @@ export const projects: Project[] = [
     featured: true,
   },
   {
+    title: "SalarySync",
+    icon: "wallet",
+    description:
+      "Full-stack personal finance app that turns a monthly salary into a per-category plan and shows, as you log expenses, what is still safe to spend. Live on Vercel with Google sign-in.",
+    highlights: [
+      "Next.js 16 Server Components and Server Actions on Supabase Postgres via Drizzle ORM; totals and breakdowns computed in SQL.",
+      "Data isolation in three layers: verified session on every request, user id on every query, and Row Level Security blocking the public API.",
+      "Salary envelopes with 90% warnings, a running-total sparkline against last month's pace, and separate investment tracking.",
+      "Zod validation at every action, dark mode with no flash on load, and reduced-motion and WCAG-aware interactions.",
+    ],
+    tech: ["Next.js", "TypeScript", "PostgreSQL", "Supabase", "Drizzle"],
+    year: 2026,
+    links: { live: "https://salarysyncc.vercel.app/", github: "https://github.com/hrrssshhhhhh/SalarySync" },
+    featured: true,
+  },
+  {
     title: "LeaseGen",
     icon: "file",
     description:
